@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Special for Chloe</title>
+<style>
+  body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+    background: #fff0f6;
+    position: relative;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  #popup-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+  }
+
+  #popup {
+    background: white;
+    padding: 2rem 2.5rem;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    text-align: center;
+    max-width: 320px;
+  }
+
+  #popup p {
+    font-size: 1.2rem;
+    margin-bottom: 1.5rem;
+    color: #d6336c;
+  }
+
+  #popup button {
+    background: #d6336c;
+    color: white;
+    border: none;
+    padding: 0.6rem 1.5rem;
+    font-size: 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  #popup button:hover {
+    background: #b52a58;
+  }
+
+  .floating-container {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 1;
+  }
+
+  .heart {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background: pink;
+    transform: rotate(45deg);
+    animation: floatUp linear infinite;
+    opacity: 0.8;
+  }
+  .heart::before,
+  .heart::after {
+    content: "";
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background: pink;
+    border-radius: 50%;
+  }
+  .heart::before {
+    top: -6px;
+    left: 0;
+  }
+  .heart::after {
+    left: 6px;
+    top: 0;
+  }
+
+  .sparkle {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: white;
+    box-shadow:
+      0 0 4px 2px #fff,
+      0 0 8px 4px #ffb6c1;
+    border-radius: 50%;
+    animation: floatUp linear infinite;
+    opacity: 0.9;
+  }
+
+  @keyframes floatUp {
+    0% {
+      transform: translateY(0) rotate(45deg);
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(-120vh) rotate(45deg);
+      opacity: 0;
+    }
+  }
+
+</style>
+</head>
+<body>
+
+<div id="popup-overlay">
+  <div id="popup">
+    <p>Hey Chloe my Bestie, I have something special for you.<br>Would you like to view it?</p>
+    <button id="yes-btn">Yes, please</button>
+  </div>
+</div>
+
+<div class="floating-container" id="floating-container"></div>
+
+<script>
+  document.getElementById('yes-btn').addEventListener('click', () => {
+    window.location.href = 'loading.html';
+  });
+
+  const container = document.getElementById('floating-container');
+
+  function createFloatingElement(className, size, duration, delay, leftPercent) {
+    const el = document.createElement('div');
+    el.classList.add(className);
+    el.style.width = size + 'px';
+    el.style.height = size + 'px';
+    el.style.left = leftPercent + 'vw';
+    el.style.animationDuration = duration + 's';
+    el.style.animationDelay = delay + 's';
+    container.appendChild(el);
+
+    el.addEventListener('animationend', () => {
+      el.remove();
+    });
+  }
+
+  function generateFloating() {
+    const heartSize = Math.random() * 10 + 8; 
+    const heartDuration = Math.random() * 8 + 6; 
+    const heartDelay = 0;
+    const heartLeft = Math.random() * 100; 
+
+    createFloatingElement('heart', heartSize, heartDuration, heartDelay, heartLeft);
+
+    const sparkleSize = Math.random() * 6 + 4; 
+    const sparkleDuration = Math.random() * 10 + 8; 
+    const sparkleDelay = 0;
+    const sparkleLeft = Math.random() * 100;
+
+    createFloatingElement('sparkle', sparkleSize, sparkleDuration, sparkleDelay, sparkleLeft);
+  }
+
+  setInterval(generateFloating, 300);
+
+</script>
+
+</body>
+</html>

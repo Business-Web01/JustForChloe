@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Loading...</title>
+<style>
+  body, html {
+    margin: 0; padding: 0;
+    height: 100%;
+    background: #ffcee7; 
+    overflow: hidden;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    position: relative;
+  }
+
+  #caption {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 2rem;
+    color: #a1003b;
+    font-weight: 600;
+    z-index: 1000;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  #plane-container {
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    pointer-events: none;
+  }
+
+  #plane {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    transform-origin: center center;
+    filter: drop-shadow(0 0 2px rgba(161,0,59,0.7));
+  }
+
+  .heart {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background: red;
+    transform: rotate(45deg);
+    pointer-events: none;
+    animation: heart-float 3s forwards;
+  }
+  .heart::before,
+  .heart::after {
+    content: "";
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background: red;
+    border-radius: 50%;
+  }
+  .heart::before {
+    top: -6px;
+    left: 0;
+  }
+  .heart::after {
+    left: 6px;
+    top: 0;
+  }
+
+  @keyframes heart-float {
+    0% {
+      opacity: 1;
+      transform: translate(0, 0) rotate(45deg);
+    }
+    100% {
+      opacity: 0;
+      transform: translate(20px, -80px) rotate(45deg);
+    }
+  }
+
+</style>
+</head>
+<body>
+
+<div id="caption">Just a second...</div>
+<div id="plane-container">
+  <svg id="plane" viewBox="0 0 64 64" fill="#a1003b" xmlns="http://www.w3.org/2000/svg">
+    <path d="M2 32 L62 12 L54 24 L62 28 L54 32 L62 36 L54 40 L62 52 Z" />
+  </svg>
+</div>
+
+<script>
+  const plane = document.getElementById('plane');
+  const container = document.getElementById('plane-container');
+
+  const pathPoints = [
+    {x: 0.1, y: 0.8, angle: 20},
+    {x: 0.25, y: 0.6, angle: 45},
+    {x: 0.5, y: 0.4, angle: 10},
+    {x: 0.75, y: 0.3, angle: -20},
+    {x: 0.85, y: 0.5, angle: 40},
+    {x: 0.9, y: 0.7, angle: 80},
+    {x: 0.7, y: 0.85, angle: 140},
+    {x: 0.45, y: 0.9, angle: 180},
+    {x: 0.25, y: 0.95, angle: 210},
+    {x: 0.1, y: 0.8, angle: 20}, 
+  ];
+
+  let currentIndex = 0;
+  const flightDuration = 20000; 
+  const stepDuration = flightDuration / (pathPoints.length - 1);
+
+  function posToPx(pos) {
+    return {
+      x: window.innerWidth * pos.x,
+      y: window.innerHeight * pos.y
+    };
+  }
+
+  function releaseHeart(x, y) {
+    const heart = document.createElement('div');
+    heart.classList.add('heart');
+    heart.style.left = (x - 6) + 'px'; 
+    heart.style.top = (y - 6) + 'px';
+    container.appendChild(heart);
+    heart.addEventListener('animationend', () => heart.remove());
+  }
+
+  function animatePlane(aIndex, bIndex) {
+    return new Promise(resolve => {
+      const start = posToPx(pathPoints[aIndex]);
+      const end = posToPx(pathPoints[bIndex]);
+      const angleStart = pathPoints[aIndex].angle;
+      const angleEnd = pathPoints[bIndex].angle;
+
+      let startTime = null;
+
+      function step(timestamp) {
+        if (!startTime) startTime = timestamp;
+        const elapsed = timestamp - startTime;
+        const progress = Math.min(elapsed / stepDuration, 1);
+
+        const currentX = start.x + (end.x - start.x) * progress;
+        const currentY = start.y + (end.y - start.y) * progress;
+        plane.style.left = currentX + 'px';
+        plane.style.top = currentY + 'px';
+
+        const currentAngle = angleStart + (angleEnd - angleStart) * progress;
+        plane.style.transform = `translate(-50%, -50%) rotate(${currentAngle}deg)`;
+
+        releaseHeart(currentX, currentY);
+
+        if (progress < 1) {
+          requestAnimationFrame(step);
+        } else {
+          resolve();
+        }
+      }
+
+      requestAnimationFrame(step);
+    });
+  }
+
+  async function flyLoop() {
+    for (let i = 0; i < pathPoints.length - 1; i++) {
+      await animatePlane(i, i + 1);
+    }
+  }
+
+  flyLoop().then(() => {
+    window.location.href = 'page2.html';
+  });
+
+  window.addEventListener('resize', () => {
+  });
+
+</script>
+
+</body>
+</html>
